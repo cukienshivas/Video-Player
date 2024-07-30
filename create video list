@@ -1,0 +1,88 @@
+from tkinter import *
+from tkinter import messagebox as msb 
+from check_videos import CheckVideos
+from video_library import get_name, set_rating, get_play_count
+from based_GUI import BaseGUI
+import font_manager as fonts
+class CreateVideoList():
+    def __init__(self, parent):
+        self.window = parent
+        #super().__init__("Create Video List", "400x550")
+        self.__radio_value = StringVar()  # Initialize the variable 
+        self.__play_count = {}
+        self.__playlist = []
+    def _create_widgets(self):
+        #Enter vide number lbl
+        self.video_number_lbl = Label(self._window, text="ENter video number:")
+        self.video_number_lbl.grid(row=0, column=0, padx=10, pady=10)
+
+        #video number entry
+        self.__video_number_entry = Entry(self._window, width=20)
+        self.__video_number_entry.grid(row=0, column=1, padx=10,pady=10)
+        #add video butt
+        self.__video_btn=Button(self._window, text="Add video", command=self._add_video)
+        self.__video_btn.grid(row=1, column=0, sticky=W, padx=10, pady=10)
+        #statu label
+        self.status_lbl = Label(self._window, width=20, bg='lightblue')
+        self.status_lbl.grid(row=1,column=1,sticky=W)
+        #text area
+        self.__text_area= Text(self._window,width=30,bg='lightblue')
+        self.__text_area.grid(row=2,column=0, columnspan=3, rowspan=3,padx=10, pady=10)
+        #Play bttn
+        self.__play_btn = Button(self._window,text="Play")
+        self.__play_btn.grid(row=5, column=0, padx=10, pady=10)
+        #reset butt
+        self.__reset_btn =Button(self._window, text="Reset")
+        self.__reset_btn.grid(row=5, column=2,padx=10, pady=10)
+
+    def _add_video(self):
+        video_number = self.__video_number_entry.get()
+        if video_number:
+            check = CheckVideos(video_number)
+            if check.is_valid():
+                video_name = CheckVideos(video_number)
+                if video_name:
+                    self.__playlist.append(video_name)
+                    self.__play_count[video_name] = 0# Play count begins
+                    self._update_text_area()
+                    self.status_lbl.config(text=f"{video_name} added!")
+                    msb.showinfo(f"{video_name} added successfully")
+                else:
+                    self.status_lbl.config(text=f"Video not found!!")
+                    msb.showerror("Error","Invalid video name.")
+            else:
+                self.status_lbl.config(text="Invalid video number.")
+                msb.showwarning("Waring","Invalid video number")
+        else:
+            msb.showwarning("Warning", "Please enter a video number")
+    def _update_text_area(self):
+        self.__text_area.delete('1.0', END)
+        for video in self._playlist:
+            self.__text_area.insert(END, video + "\n")
+
+    def _play_playlist(self):
+        for video in self._playlist:
+            self._play_count[video] += 1
+        self.status_lbl.config(text="Playlist played")
+        self.show_play_count()
+
+    def _show_play_count(self):
+        play_count_text = "Play count:\n"
+        for video, count in self._play_count.items():
+            play_count_text += f"{video}: {count}\n"
+        msb.showinfo("Play Count", play_count_text)
+
+    def _reset_playlist(self):
+        self._playlist = []
+        self._play_count = {}
+        self.__text_area.delete('1.0', END)
+        self.status_lbl.config(text="Playlist reset")
+        msb.showinfo("Reset", "Playlist has been reset")
+
+if __name__ == "__main__":
+    createvideolist = CreateVideoList()
+    createvideolist.run()
+
+
+
+
